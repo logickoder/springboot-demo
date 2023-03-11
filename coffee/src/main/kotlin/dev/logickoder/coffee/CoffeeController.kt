@@ -1,44 +1,39 @@
 package dev.logickoder.coffee
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RestController
 @RequestMapping("/coffees")
-class CoffeeController {
-    private val coffees = mutableListOf<Coffee>().apply {
-        add(Coffee(name = "Café Cereza"))
-        add(Coffee(name = "Café Ganador"))
-        add(Coffee(name = "Café Lareño"))
-        add(Coffee(name = "Café Três Pontas"))
-    }
+class CoffeeController(private val repository: CoffeeRepository) {
 
     @GetMapping
-    fun getCoffees(): Iterable<Coffee> = coffees
+    fun getCoffees(): Iterable<Coffee> = repository.findAll()
 
     @GetMapping("/{id}")
     fun getCoffee(@PathVariable id: String): Coffee? {
-        return coffees.firstOrNull { it.id == id }
+        return repository.findByIdOrNull(id)
     }
 
     @PostMapping
     fun postCoffee(@RequestBody coffee: Coffee): Coffee {
-        coffees.add(coffee)
+        repository.save(coffee)
         return coffee
     }
 
     @PutMapping("/{id}")
     fun putCoffee(@PathVariable id: String, @RequestBody coffee: Coffee): ResponseEntity<Coffee> {
-        val index = coffees.indexOfFirst { it.id == id }
-        return if (index != -1) {
-            coffees[index] = coffee
+        return if (repository.existsById(id)) {
+            repository.save(coffee)
             ResponseEntity(coffee, HttpStatus.OK)
         } else ResponseEntity(postCoffee(coffee), HttpStatus.CREATED)
     }
 
     @DeleteMapping("/{id}")
     fun deleteCoffee(@PathVariable id: String) {
-        coffees.removeIf { it.id == id }
+        repository.deleteById(id)
     }
 }
