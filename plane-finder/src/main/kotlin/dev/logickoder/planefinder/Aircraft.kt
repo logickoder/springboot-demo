@@ -3,9 +3,12 @@ package dev.logickoder.planefinder
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import jakarta.persistence.Id
+import org.springframework.data.redis.core.RedisHash
 import java.time.Instant
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@RedisHash
 data class Aircraft(
         @JsonProperty("altitude")
         val altitude: Int = 0,
@@ -19,8 +22,9 @@ data class Aircraft(
         val flightNo: String = "",
         @JsonProperty("heading")
         val heading: Int = 0,
+        @Id
         @JsonProperty("id")
-        val id: Int = 0,
+        val id: Long = 0,
         @JsonProperty("is_adsb")
         val isAdsb: Boolean = false,
         @JsonProperty("is_on_ground")
