@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDateTime
-import kotlin.time.Duration.Companion.minutes
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @RestController
 class ExerciseController(private val users: UserRepository, private val exercises: ExerciseRepository) {
@@ -28,15 +28,15 @@ class ExerciseController(private val users: UserRepository, private val exercise
 
         val duration = runCatching {
             if (body.duration.isNullOrBlank()) throw Exception("Duration is required")
-            body.duration.toInt().minutes
+            body.duration.toInt()
         }.getOrElse {
             return ResponseEntity.badRequest().body(it.localizedMessage)
         }
 
         val date = run {
             if (body.date.isNullOrBlank()) {
-                LocalDateTime.now()
-            } else LocalDateTime.parse(body.date)
+                LocalDate.now()
+            } else LocalDate.parse(body.date, DateTimeFormatter.ISO_LOCAL_DATE)
         }
 
         val exercise = exercises.save(
