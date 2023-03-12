@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
+import java.time.Month
 
 @RestController
 @RequestMapping("/api/users")
@@ -44,12 +45,12 @@ class UserController(private val users: UserRepository, private val exercises: E
         val user = users.findByIdOrNull(username)
             ?: return ResponseEntity.badRequest().body("User does not exist")
 
-        var items = exercises.findByDateBeforeAndDateAfter(
-            from.toLocalDate { LocalDate.MIN },
-            to.toLocalDate { LocalDate.MAX },
+        var items = exercises.findByDateBetween(
+            from.toLocalDate { LocalDate.EPOCH },
+            to.toLocalDate { LocalDate.of(2038, Month.JANUARY, 19) },
         )
 
-        if (limit?.toIntOrNull() != null) {
+        if (limit?.toIntOrNull() != null && items.size > limit.toInt()) {
             items = items.chunked(limit.toInt()).first()
         }
 

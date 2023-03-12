@@ -6,5 +6,5 @@ import java.time.LocalDate
 
 interface ExerciseRepository : CrudRepository<Exercise, Long> {
 
-    fun findByDateBeforeAndDateAfter(from: LocalDate, to: LocalDate): Iterable<Exercise>
+    fun findByDateBetween(from: LocalDate, to: LocalDate): List<Exercise>
 }
