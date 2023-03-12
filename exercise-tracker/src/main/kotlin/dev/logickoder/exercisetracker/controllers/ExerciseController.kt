@@ -9,8 +9,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @RestController
 class ExerciseController(private val users: UserRepository, private val exercises: ExerciseRepository) {
@@ -33,18 +31,12 @@ class ExerciseController(private val users: UserRepository, private val exercise
             return ResponseEntity.badRequest().body(it.localizedMessage)
         }
 
-        val date = run {
-            if (body.date.isNullOrBlank()) {
-                LocalDate.now()
-            } else LocalDate.parse(body.date, DateTimeFormatter.ISO_LOCAL_DATE)
-        }
-
         val exercise = exercises.save(
             Exercise(
                 username = user.username,
                 description = body.description,
                 duration = duration,
-                date = date,
+                date = body.date.toLocalDate(),
             )
         )
 
